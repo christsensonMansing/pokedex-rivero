@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Grid,
@@ -24,9 +24,9 @@ import {
   AlertIcon,
   AlertTitle,
   AlertDescription,
-} from '@chakra-ui/react';
-import axios from 'axios';
-import BattleHistory from './BattleHistory';
+} from "@chakra-ui/react";
+import axios from "axios";
+import BattleHistory from "./BattleHistory";
 
 interface Round {
   stat: string;
@@ -36,13 +36,13 @@ interface Round {
 }
 
 interface BattlePokemon {
-  id: number;  // Pokemon's ID from PokeAPI
-  teamId: number;  // Unique team entry ID
+  id: number; // Pokemon's ID from PokeAPI
+  teamId: number; // Unique team entry ID
   name: string;
   sprites: {
     front_default: string;
     other: {
-      'official-artwork': {
+      "official-artwork": {
         front_default: string;
       };
     };
@@ -69,8 +69,10 @@ interface BattleResult {
 
 const BattleArena: React.FC = () => {
   const [team, setTeam] = useState<BattlePokemon[]>([]);
-  const [selectedPokemon1, setSelectedPokemon1] = useState<BattlePokemon | null>(null);
-  const [selectedPokemon2, setSelectedPokemon2] = useState<BattlePokemon | null>(null);
+  const [selectedPokemon1, setSelectedPokemon1] =
+    useState<BattlePokemon | null>(null);
+  const [selectedPokemon2, setSelectedPokemon2] =
+    useState<BattlePokemon | null>(null);
   const [battleResult, setBattleResult] = useState<BattleResult | null>(null);
   const [loading, setLoading] = useState(true);
   const toast = useToast();
@@ -81,22 +83,26 @@ const BattleArena: React.FC = () => {
 
   const fetchTeam = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/team');
+      const response = await axios.get(
+        "https://pokedex-json.onrender.com/team"
+      );
       const teamData = await Promise.all(
-        response.data.map(async (pokemon: { pokemonId: number, id: number }) => {
-          const pokemonResponse = await axios.get(
-            `https://pokeapi.co/api/v2/pokemon/${pokemon.pokemonId}`
-          );
-          return {
-            ...pokemonResponse.data,
-            teamId: pokemon.id  // Store the unique team entry ID
-          };
-        })
+        response.data.map(
+          async (pokemon: { pokemonId: number; id: number }) => {
+            const pokemonResponse = await axios.get(
+              `https://pokeapi.co/api/v2/pokemon/${pokemon.pokemonId}`
+            );
+            return {
+              ...pokemonResponse.data,
+              teamId: pokemon.id, // Store the unique team entry ID
+            };
+          }
+        )
       );
       setTeam(teamData);
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching team:', error);
+      console.error("Error fetching team:", error);
       setLoading(false);
     }
   };
@@ -105,19 +111,21 @@ const BattleArena: React.FC = () => {
     try {
       // Get a random Pokémon ID between 1 and 151 (first generation)
       const randomId = Math.floor(Math.random() * 151) + 1;
-      const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${randomId}`);
+      const response = await axios.get(
+        `https://pokeapi.co/api/v2/pokemon/${randomId}`
+      );
       setSelectedPokemon2(response.data);
     } catch (error) {
-      console.error('Error fetching random Pokémon:', error);
+      console.error("Error fetching random Pokémon:", error);
     }
   };
 
   const simulateBattle = () => {
     if (!selectedPokemon1 || !selectedPokemon2) {
       toast({
-        title: 'Select Pokémon',
-        description: 'Please select both Pokémon for battle',
-        status: 'warning',
+        title: "Select Pokémon",
+        description: "Please select both Pokémon for battle",
+        status: "warning",
         duration: 3000,
         isClosable: true,
       });
@@ -131,11 +139,22 @@ const BattleArena: React.FC = () => {
     let totalStats2 = 0;
 
     // Compare each stat
-    const statsToCompare = ['hp', 'attack', 'defense', 'speed', 'special-attack', 'special-defense'];
-    statsToCompare.forEach(statName => {
-      const stat1 = selectedPokemon1.stats.find(s => s.stat.name === statName)?.base_stat || 0;
-      const stat2 = selectedPokemon2.stats.find(s => s.stat.name === statName)?.base_stat || 0;
-      
+    const statsToCompare = [
+      "hp",
+      "attack",
+      "defense",
+      "speed",
+      "special-attack",
+      "special-defense",
+    ];
+    statsToCompare.forEach((statName) => {
+      const stat1 =
+        selectedPokemon1.stats.find((s) => s.stat.name === statName)
+          ?.base_stat || 0;
+      const stat2 =
+        selectedPokemon2.stats.find((s) => s.stat.name === statName)
+          ?.base_stat || 0;
+
       totalStats1 += stat1;
       totalStats2 += stat2;
 
@@ -143,55 +162,63 @@ const BattleArena: React.FC = () => {
         stat: statName,
         pokemon1Value: stat1,
         pokemon2Value: stat2,
-        winner: stat1 > stat2 ? selectedPokemon1.name : (stat1 < stat2 ? selectedPokemon2.name : 'tie')
+        winner:
+          stat1 > stat2
+            ? selectedPokemon1.name
+            : stat1 < stat2
+            ? selectedPokemon2.name
+            : "tie",
       });
 
       if (stat1 > stat2) pokemon1Wins++;
       else if (stat2 > stat1) pokemon2Wins++;
     });
 
-    const winner = pokemon1Wins > pokemon2Wins ? selectedPokemon1.name : selectedPokemon2.name;
+    const winner =
+      pokemon1Wins > pokemon2Wins
+        ? selectedPokemon1.name
+        : selectedPokemon2.name;
     const result: BattleResult = {
       winner,
       rounds,
       totalStats1,
-      totalStats2
+      totalStats2,
     };
 
     setBattleResult(result);
 
     // Save battle result
-    axios.post('http://localhost:3001/battles', {
+    axios.post("https://pokedex-json.onrender.com/battles", {
       pokemon1: selectedPokemon1.name,
       pokemon2: selectedPokemon2.name,
       winner,
       timestamp: new Date().toISOString(),
-      battleDetails: rounds
+      battleDetails: rounds,
     });
   };
 
   const getTypeColor = (type: string) => {
     const colors: { [key: string]: string } = {
-      grass: '#78C850',
-      poison: '#A040A0',
-      fire: '#F08030',
-      flying: '#A890F0',
-      water: '#6890F0',
-      bug: '#A8B820',
-      normal: '#A8A878',
-      electric: '#F8D030',
-      ground: '#E0C068',
-      fairy: '#EE99AC',
-      fighting: '#C03028',
-      psychic: '#F85888',
-      rock: '#B8A038',
-      steel: '#B8B8D0',
-      ice: '#98D8D8',
-      ghost: '#705898',
-      dragon: '#7038F8',
-      dark: '#705848',
+      grass: "#78C850",
+      poison: "#A040A0",
+      fire: "#F08030",
+      flying: "#A890F0",
+      water: "#6890F0",
+      bug: "#A8B820",
+      normal: "#A8A878",
+      electric: "#F8D030",
+      ground: "#E0C068",
+      fairy: "#EE99AC",
+      fighting: "#C03028",
+      psychic: "#F85888",
+      rock: "#B8A038",
+      steel: "#B8B8D0",
+      ice: "#98D8D8",
+      ghost: "#705898",
+      dragon: "#7038F8",
+      dark: "#705848",
     };
-    return colors[type] || 'gray.500';
+    return colors[type] || "gray.500";
   };
 
   if (loading) {
@@ -203,7 +230,7 @@ const BattleArena: React.FC = () => {
       <Heading mb={6} textAlign="center" color="white">
         Battle Arena
       </Heading>
-      <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap={8}>
+      <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={8}>
         <Box>
           <Select
             placeholder="Select Your Pokémon"
@@ -211,7 +238,9 @@ const BattleArena: React.FC = () => {
             bg="white"
             color="black"
             onChange={(e) => {
-              const pokemon = team.find((p) => p.teamId === parseInt(e.target.value));
+              const pokemon = team.find(
+                (p) => p.teamId === parseInt(e.target.value)
+              );
               setSelectedPokemon1(pokemon || null);
             }}
           >
@@ -225,9 +254,14 @@ const BattleArena: React.FC = () => {
             <Card bg="white">
               <CardBody>
                 <VStack spacing={3}>
-                  <Heading size="md" color="black">{selectedPokemon1.name}</Heading>
+                  <Heading size="md" color="black">
+                    {selectedPokemon1.name}
+                  </Heading>
                   <Image
-                    src={selectedPokemon1.sprites.other['official-artwork'].front_default}
+                    src={
+                      selectedPokemon1.sprites.other["official-artwork"]
+                        .front_default
+                    }
                     alt={selectedPokemon1.name}
                     h="200px"
                     objectFit="contain"
@@ -248,10 +282,16 @@ const BattleArena: React.FC = () => {
                   {selectedPokemon1.stats.map((stat) => (
                     <Box key={stat.stat.name} w="full">
                       <Flex justify="space-between">
-                        <Text color="black" textTransform="capitalize">{stat.stat.name}</Text>
+                        <Text color="black" textTransform="capitalize">
+                          {stat.stat.name}
+                        </Text>
                         <Text color="black">{stat.base_stat}</Text>
                       </Flex>
-                      <Progress value={stat.base_stat} max={255} colorScheme="blue" />
+                      <Progress
+                        value={stat.base_stat}
+                        max={255}
+                        colorScheme="blue"
+                      />
                     </Box>
                   ))}
                 </VStack>
@@ -261,11 +301,7 @@ const BattleArena: React.FC = () => {
         </Box>
         <Box>
           <Flex mb={4} gap={2}>
-            <Button
-              colorScheme="purple"
-              onClick={getRandomPokemon}
-              flex={1}
-            >
+            <Button colorScheme="purple" onClick={getRandomPokemon} flex={1}>
               Random Opponent
             </Button>
           </Flex>
@@ -273,9 +309,14 @@ const BattleArena: React.FC = () => {
             <Card bg="white">
               <CardBody>
                 <VStack spacing={3}>
-                  <Heading size="md" color="black">{selectedPokemon2.name}</Heading>
+                  <Heading size="md" color="black">
+                    {selectedPokemon2.name}
+                  </Heading>
                   <Image
-                    src={selectedPokemon2.sprites.other['official-artwork'].front_default}
+                    src={
+                      selectedPokemon2.sprites.other["official-artwork"]
+                        .front_default
+                    }
                     alt={selectedPokemon2.name}
                     h="200px"
                     objectFit="contain"
@@ -296,10 +337,16 @@ const BattleArena: React.FC = () => {
                   {selectedPokemon2.stats.map((stat) => (
                     <Box key={stat.stat.name} w="full">
                       <Flex justify="space-between">
-                        <Text color="black" textTransform="capitalize">{stat.stat.name}</Text>
+                        <Text color="black" textTransform="capitalize">
+                          {stat.stat.name}
+                        </Text>
                         <Text color="black">{stat.base_stat}</Text>
                       </Flex>
-                      <Progress value={stat.base_stat} max={255} colorScheme="red" />
+                      <Progress
+                        value={stat.base_stat}
+                        max={255}
+                        colorScheme="red"
+                      />
                     </Box>
                   ))}
                 </VStack>
@@ -323,7 +370,11 @@ const BattleArena: React.FC = () => {
       {battleResult && (
         <Box mt={8}>
           <Alert
-            status={battleResult.winner === selectedPokemon1?.name ? 'success' : 'error'}
+            status={
+              battleResult.winner === selectedPokemon1?.name
+                ? "success"
+                : "error"
+            }
             variant="solid"
             flexDirection="column"
             alignItems="center"
@@ -340,7 +391,9 @@ const BattleArena: React.FC = () => {
             <AlertDescription maxWidth="sm" fontSize="lg">
               {battleResult.winner} wins!
               <Text mt={2} fontWeight="bold">
-                Total Stats - {selectedPokemon1?.name}: {battleResult.totalStats1} vs {selectedPokemon2?.name}: {battleResult.totalStats2}
+                Total Stats - {selectedPokemon1?.name}:{" "}
+                {battleResult.totalStats1} vs {selectedPokemon2?.name}:{" "}
+                {battleResult.totalStats2}
               </Text>
             </AlertDescription>
           </Alert>
@@ -357,10 +410,20 @@ const BattleArena: React.FC = () => {
             <Tbody>
               {battleResult.rounds.map((round, index) => (
                 <Tr key={index}>
-                  <Td textTransform="capitalize" color="white">{round.stat}</Td>
+                  <Td textTransform="capitalize" color="white">
+                    {round.stat}
+                  </Td>
                   <Td color="white">{round.pokemon1Value}</Td>
                   <Td color="white">{round.pokemon2Value}</Td>
-                  <Td textTransform="capitalize" color="white" fontWeight={round.winner === battleResult.winner ? "bold" : "normal"}>{round.winner}</Td>
+                  <Td
+                    textTransform="capitalize"
+                    color="white"
+                    fontWeight={
+                      round.winner === battleResult.winner ? "bold" : "normal"
+                    }
+                  >
+                    {round.winner}
+                  </Td>
                 </Tr>
               ))}
             </Tbody>
@@ -375,4 +438,4 @@ const BattleArena: React.FC = () => {
   );
 };
 
-export default BattleArena; 
+export default BattleArena;

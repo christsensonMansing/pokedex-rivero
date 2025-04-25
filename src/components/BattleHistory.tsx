@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Table,
@@ -24,8 +24,8 @@ import {
   AlertDialogContent,
   AlertDialogOverlay,
   Flex,
-} from '@chakra-ui/react';
-import axios from 'axios';
+} from "@chakra-ui/react";
+import axios from "axios";
 
 interface BattleDetail {
   stat: string;
@@ -57,11 +57,13 @@ const BattleHistory: React.FC = () => {
 
   const fetchBattles = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/battles');
+      const response = await axios.get(
+        "https://pokedex-json.onrender.com/battles"
+      );
       setBattles(response.data.reverse()); // Show newest battles first
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching battles:', error);
+      console.error("Error fetching battles:", error);
       setLoading(false);
     }
   };
@@ -72,27 +74,30 @@ const BattleHistory: React.FC = () => {
       // Delete battles one by one to avoid overwhelming the server
       for (const battle of battles) {
         try {
-          await axios.delete(`http://localhost:3001/battles/${battle.id}`);
+          await axios.delete(
+            `https://pokedex-json.onrender.com/battles/${battle.id}`
+          );
         } catch (error) {
           console.error(`Error deleting battle ${battle.id}:`, error);
           throw error; // Re-throw to trigger the outer catch block
         }
       }
-      
+
       setBattles([]);
       toast({
-        title: 'Battle history cleared',
-        description: 'All battle records have been deleted',
-        status: 'success',
+        title: "Battle history cleared",
+        description: "All battle records have been deleted",
+        status: "success",
         duration: 3000,
         isClosable: true,
       });
     } catch (error) {
-      console.error('Error clearing battle history:', error);
+      console.error("Error clearing battle history:", error);
       toast({
-        title: 'Error clearing battle history',
-        description: 'Some battles may not have been deleted. Please try again.',
-        status: 'error',
+        title: "Error clearing battle history",
+        description:
+          "Some battles may not have been deleted. Please try again.",
+        status: "error",
         duration: 5000,
         isClosable: true,
       });
@@ -120,7 +125,7 @@ const BattleHistory: React.FC = () => {
             size="sm"
             isDisabled={isClearing}
           >
-            {isClearing ? 'Clearing...' : 'Clear History'}
+            {isClearing ? "Clearing..." : "Clear History"}
           </Button>
         )}
       </Flex>
@@ -141,12 +146,16 @@ const BattleHistory: React.FC = () => {
             </AlertDialogBody>
 
             <AlertDialogFooter>
-              <Button ref={cancelRef} onClick={() => setIsOpen(false)} isDisabled={isClearing}>
+              <Button
+                ref={cancelRef}
+                onClick={() => setIsOpen(false)}
+                isDisabled={isClearing}
+              >
                 Cancel
               </Button>
-              <Button 
-                colorScheme="red" 
-                onClick={clearHistory} 
+              <Button
+                colorScheme="red"
+                onClick={clearHistory}
                 ml={3}
                 isLoading={isClearing}
                 loadingText="Clearing..."
@@ -165,7 +174,12 @@ const BattleHistory: React.FC = () => {
       ) : (
         <Accordion allowMultiple>
           {battles.map((battle) => (
-            <AccordionItem key={battle.id} bg="whiteAlpha.200" mb={4} borderRadius="lg">
+            <AccordionItem
+              key={battle.id}
+              bg="whiteAlpha.200"
+              mb={4}
+              borderRadius="lg"
+            >
               <AccordionButton>
                 <Box flex="1" textAlign="left">
                   <Text fontSize="lg" fontWeight="bold">
@@ -176,7 +190,9 @@ const BattleHistory: React.FC = () => {
                   </Text>
                 </Box>
                 <Badge
-                  colorScheme={battle.winner === battle.pokemon1 ? "green" : "red"}
+                  colorScheme={
+                    battle.winner === battle.pokemon1 ? "green" : "red"
+                  }
                   fontSize="md"
                   px={3}
                   py={1}
@@ -193,20 +209,34 @@ const BattleHistory: React.FC = () => {
                     <Thead>
                       <Tr>
                         <Th color="gray.300">Stat</Th>
-                        <Th color="gray.300" isNumeric>{battle.pokemon1}</Th>
-                        <Th color="gray.300" isNumeric>{battle.pokemon2}</Th>
+                        <Th color="gray.300" isNumeric>
+                          {battle.pokemon1}
+                        </Th>
+                        <Th color="gray.300" isNumeric>
+                          {battle.pokemon2}
+                        </Th>
                         <Th color="gray.300">Winner</Th>
                       </Tr>
                     </Thead>
                     <Tbody>
                       {battle.battleDetails.map((detail, index) => (
                         <Tr key={index}>
-                          <Td color="white" textTransform="capitalize">{detail.stat}</Td>
-                          <Td color="white" isNumeric>{detail.pokemon1Value}</Td>
-                          <Td color="white" isNumeric>{detail.pokemon2Value}</Td>
+                          <Td color="white" textTransform="capitalize">
+                            {detail.stat}
+                          </Td>
+                          <Td color="white" isNumeric>
+                            {detail.pokemon1Value}
+                          </Td>
+                          <Td color="white" isNumeric>
+                            {detail.pokemon2Value}
+                          </Td>
                           <Td>
                             <Badge
-                              colorScheme={detail.winner === battle.winner ? "green" : "yellow"}
+                              colorScheme={
+                                detail.winner === battle.winner
+                                  ? "green"
+                                  : "yellow"
+                              }
                               variant="subtle"
                             >
                               {detail.winner}
@@ -217,7 +247,9 @@ const BattleHistory: React.FC = () => {
                     </Tbody>
                   </Table>
                 ) : (
-                  <Text color="gray.300">No detailed stats available for this battle.</Text>
+                  <Text color="gray.300">
+                    No detailed stats available for this battle.
+                  </Text>
                 )}
               </AccordionPanel>
             </AccordionItem>
@@ -228,4 +260,4 @@ const BattleHistory: React.FC = () => {
   );
 };
 
-export default BattleHistory; 
+export default BattleHistory;

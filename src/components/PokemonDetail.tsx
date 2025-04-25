@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Card,
@@ -13,9 +13,9 @@ import {
   StatNumber,
   Button,
   useToast,
-} from '@chakra-ui/react';
-import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+} from "@chakra-ui/react";
+import { useParams, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 interface PokemonDetail {
   id: number;
@@ -60,7 +60,7 @@ const PokemonDetail: React.FC = () => {
         setPokemon(response.data);
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching Pokémon details:', error);
+        console.error("Error fetching Pokémon details:", error);
         setLoading(false);
       }
     };
@@ -70,21 +70,21 @@ const PokemonDetail: React.FC = () => {
 
   const addToTeam = async () => {
     try {
-      await axios.post('http://localhost:3001/team', {
+      await axios.post("https://pokedex-json.onrender.com/team", {
         pokemonId: pokemon?.id,
         name: pokemon?.name,
         timestamp: new Date().toISOString(),
       });
       toast({
-        title: 'Pokémon added to team',
-        status: 'success',
+        title: "Pokémon added to team",
+        status: "success",
         duration: 3000,
         isClosable: true,
       });
     } catch (error) {
       toast({
-        title: 'Error adding Pokémon to team',
-        status: 'error',
+        title: "Error adding Pokémon to team",
+        status: "error",
         duration: 3000,
         isClosable: true,
       });
@@ -107,7 +107,7 @@ const PokemonDetail: React.FC = () => {
       <Card bg="whiteAlpha.200" backdropFilter="blur(10px)">
         <CardBody>
           <Grid
-            templateColumns={{ base: '1fr', md: '1fr 2fr' }}
+            templateColumns={{ base: "1fr", md: "1fr 2fr" }}
             gap={6}
             alignItems="center"
           >
@@ -180,4 +180,4 @@ const PokemonDetail: React.FC = () => {
   );
 };
 
-export default PokemonDetail; 
+export default PokemonDetail;

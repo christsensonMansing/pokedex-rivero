@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Box,
   SimpleGrid,
@@ -11,12 +11,12 @@ import {
   Button,
   useToast,
   Heading,
-} from '@chakra-ui/react';
-import axios from 'axios';
+} from "@chakra-ui/react";
+import axios from "axios";
 
 interface TeamPokemon {
-  id: number;  // This is the Pokemon's ID from PokeAPI
-  teamId: number;  // This will store the unique team entry ID
+  id: number; // This is the Pokemon's ID from PokeAPI
+  teamId: number; // This will store the unique team entry ID
   name: string;
   sprites: {
     front_default: string;
@@ -39,40 +39,44 @@ const TeamBuilder: React.FC = () => {
 
   const fetchTeam = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/team');
+      const response = await axios.get(
+        "https://pokedex-json.onrender.com/team"
+      );
       const teamData = await Promise.all(
-        response.data.map(async (pokemon: { pokemonId: number, id: number }) => {
-          const pokemonResponse = await axios.get(
-            `https://pokeapi.co/api/v2/pokemon/${pokemon.pokemonId}`
-          );
-          return {
-            ...pokemonResponse.data,
-            teamId: pokemon.id  // Store the unique team entry ID
-          };
-        })
+        response.data.map(
+          async (pokemon: { pokemonId: number; id: number }) => {
+            const pokemonResponse = await axios.get(
+              `https://pokeapi.co/api/v2/pokemon/${pokemon.pokemonId}`
+            );
+            return {
+              ...pokemonResponse.data,
+              teamId: pokemon.id, // Store the unique team entry ID
+            };
+          }
+        )
       );
       setTeam(teamData);
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching team:', error);
+      console.error("Error fetching team:", error);
       setLoading(false);
     }
   };
 
   const removeFromTeam = async (teamId: number) => {
     try {
-      await axios.delete(`http://localhost:3001/team/${teamId}`);
+      await axios.delete(`https://pokedex-json.onrender.com/team/${teamId}`);
       setTeam(team.filter((p) => p.teamId !== teamId));
       toast({
-        title: 'Pokémon removed from team',
-        status: 'success',
+        title: "Pokémon removed from team",
+        status: "success",
         duration: 3000,
         isClosable: true,
       });
     } catch (error) {
       toast({
-        title: 'Error removing Pokémon from team',
-        status: 'error',
+        title: "Error removing Pokémon from team",
+        status: "error",
         duration: 3000,
         isClosable: true,
       });
@@ -145,4 +149,4 @@ const TeamBuilder: React.FC = () => {
   );
 };
 
-export default TeamBuilder; 
+export default TeamBuilder;

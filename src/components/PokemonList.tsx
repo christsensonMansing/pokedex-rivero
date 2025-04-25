@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   SimpleGrid,
   Card,
@@ -15,9 +15,9 @@ import {
   HStack,
   VStack,
   Divider,
-} from '@chakra-ui/react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+} from "@chakra-ui/react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 interface Pokemon {
   id: number;
@@ -25,7 +25,7 @@ interface Pokemon {
   sprites: {
     front_default: string;
     other: {
-      'official-artwork': {
+      "official-artwork": {
         front_default: string;
       };
     };
@@ -42,7 +42,7 @@ interface Pokemon {
 const PokemonList: React.FC = () => {
   const [pokemon, setPokemon] = useState<Pokemon[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const limit = 10;
@@ -68,7 +68,7 @@ const PokemonList: React.FC = () => {
       setPokemon(pokemonData);
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching Pokémon:', error);
+      console.error("Error fetching Pokémon:", error);
       setLoading(false);
     }
   };
@@ -79,12 +79,14 @@ const PokemonList: React.FC = () => {
 
   const addToTeam = async (pokemon: Pokemon) => {
     try {
-      const response = await axios.get('http://localhost:3001/team');
+      const response = await axios.get(
+        "https://pokedex-json.onrender.com/team"
+      );
       if (response.data.length >= 6) {
         toast({
-          title: 'Team is full',
-          description: 'You can only have 6 Pokémon in your team',
-          status: 'warning',
+          title: "Team is full",
+          description: "You can only have 6 Pokémon in your team",
+          status: "warning",
           duration: 3000,
           isClosable: true,
         });
@@ -92,36 +94,38 @@ const PokemonList: React.FC = () => {
       }
 
       // Check for duplicate Pokemon
-      const isDuplicate = response.data.some((p: { pokemonId: number }) => p.pokemonId === pokemon.id);
+      const isDuplicate = response.data.some(
+        (p: { pokemonId: number }) => p.pokemonId === pokemon.id
+      );
       if (isDuplicate) {
         toast({
-          title: 'Duplicate Pokemon',
+          title: "Duplicate Pokemon",
           description: `${pokemon.name} is already in your team`,
-          status: 'warning',
+          status: "warning",
           duration: 3000,
           isClosable: true,
         });
         return;
       }
 
-      await axios.post('http://localhost:3001/team', {
+      await axios.post("https://pokedex-json.onrender.com/team", {
         pokemonId: pokemon.id,
         name: pokemon.name,
         timestamp: new Date().toISOString(),
       });
 
       toast({
-        title: 'Success',
+        title: "Success",
         description: `${pokemon.name} added to your team!`,
-        status: 'success',
+        status: "success",
         duration: 3000,
         isClosable: true,
       });
     } catch (error) {
       toast({
-        title: 'Error',
-        description: 'Failed to add Pokémon to team',
-        status: 'error',
+        title: "Error",
+        description: "Failed to add Pokémon to team",
+        status: "error",
         duration: 3000,
         isClosable: true,
       });
@@ -134,31 +138,31 @@ const PokemonList: React.FC = () => {
 
   const getTypeColor = (type: string) => {
     const colors: { [key: string]: string } = {
-      grass: '#78C850',
-      poison: '#A040A0',
-      fire: '#F08030',
-      flying: '#A890F0',
-      water: '#6890F0',
-      bug: '#A8B820',
-      normal: '#A8A878',
-      electric: '#F8D030',
-      ground: '#E0C068',
-      fairy: '#EE99AC',
-      fighting: '#C03028',
-      psychic: '#F85888',
-      rock: '#B8A038',
-      steel: '#B8B8D0',
-      ice: '#98D8D8',
-      ghost: '#705898',
-      dragon: '#7038F8',
-      dark: '#705848',
+      grass: "#78C850",
+      poison: "#A040A0",
+      fire: "#F08030",
+      flying: "#A890F0",
+      water: "#6890F0",
+      bug: "#A8B820",
+      normal: "#A8A878",
+      electric: "#F8D030",
+      ground: "#E0C068",
+      fairy: "#EE99AC",
+      fighting: "#C03028",
+      psychic: "#F85888",
+      rock: "#B8A038",
+      steel: "#B8B8D0",
+      ice: "#98D8D8",
+      ghost: "#705898",
+      dragon: "#7038F8",
+      dark: "#705848",
     };
-    return colors[type] || 'gray.500';
+    return colors[type] || "gray.500";
   };
 
   const getContrastColor = (type: string) => {
-    const darkTypes = ['grass', 'electric', 'fairy', 'ice'];
-    return darkTypes.includes(type) ? 'black' : 'white';
+    const darkTypes = ["grass", "electric", "fairy", "ice"];
+    return darkTypes.includes(type) ? "black" : "white";
   };
 
   return (
@@ -170,7 +174,7 @@ const PokemonList: React.FC = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           bg="white"
           color="black"
-          _placeholder={{ color: 'gray.500' }}
+          _placeholder={{ color: "gray.500" }}
         />
       </Flex>
       <SimpleGrid columns={{ base: 2, sm: 3, md: 4, lg: 5 }} spacing={4}>
@@ -184,12 +188,14 @@ const PokemonList: React.FC = () => {
             position="relative"
             _before={{
               content: '""',
-              position: 'absolute',
+              position: "absolute",
               top: 0,
               left: 0,
               right: 0,
               bottom: 0,
-              bg: `linear-gradient(180deg, ${getTypeColor(p.types[0].type.name)}33 0%, ${getTypeColor(p.types[0].type.name)}66 100%)`,
+              bg: `linear-gradient(180deg, ${getTypeColor(
+                p.types[0].type.name
+              )}33 0%, ${getTypeColor(p.types[0].type.name)}66 100%)`,
               opacity: 0.3,
               zIndex: 0,
             }}
@@ -206,7 +212,7 @@ const PokemonList: React.FC = () => {
                   •{p.name}•
                 </Text>
                 <Image
-                  src={p.sprites.other['official-artwork'].front_default}
+                  src={p.sprites.other["official-artwork"].front_default}
                   alt={p.name}
                   mx="auto"
                   h="120px"
@@ -233,11 +239,15 @@ const PokemonList: React.FC = () => {
                 <Flex justify="space-between" w="full" color="black">
                   <VStack align="start" spacing={0}>
                     <Text fontSize="2xs">Height</Text>
-                    <Text fontSize="xs" fontWeight="bold">{p.height / 10}M</Text>
+                    <Text fontSize="xs" fontWeight="bold">
+                      {p.height / 10}M
+                    </Text>
                   </VStack>
                   <VStack align="end" spacing={0}>
                     <Text fontSize="2xs">Weight</Text>
-                    <Text fontSize="xs" fontWeight="bold">{p.weight / 10}KG</Text>
+                    <Text fontSize="xs" fontWeight="bold">
+                      {p.weight / 10}KG
+                    </Text>
                   </VStack>
                 </Flex>
                 <Button
@@ -246,7 +256,7 @@ const PokemonList: React.FC = () => {
                   variant="solid"
                   bg="blackAlpha.200"
                   color="black"
-                  _hover={{ bg: 'blackAlpha.300' }}
+                  _hover={{ bg: "blackAlpha.300" }}
                   onClick={() => addToTeam(p)}
                 >
                   Add to Team
@@ -257,7 +267,7 @@ const PokemonList: React.FC = () => {
                   variant="solid"
                   bg="blackAlpha.200"
                   color="black"
-                  _hover={{ bg: 'blackAlpha.300' }}
+                  _hover={{ bg: "blackAlpha.300" }}
                   onClick={() => navigate(`/pokemon/${p.id}`)}
                 >
                   More Details
@@ -280,7 +290,9 @@ const PokemonList: React.FC = () => {
           Page {currentPage} of {totalPages}
         </Text>
         <Button
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+          onClick={() =>
+            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+          }
           isDisabled={currentPage === totalPages}
           colorScheme="blackAlpha"
           size="sm"
@@ -292,4 +304,4 @@ const PokemonList: React.FC = () => {
   );
 };
 
-export default PokemonList; 
+export default PokemonList;
